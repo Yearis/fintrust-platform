@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-gray-50; /* This sets the light gray background */
+}
+
+.nav-link.active {
+  @apply text-fintrust-green border-b-2 border-fintrust-green;
+}
