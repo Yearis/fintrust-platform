@@ -13,15 +13,12 @@ try {
   const secretKeyBytes = bs58.decode(secretKeyString);
   platformKeypair = Keypair.fromSecretKey(secretKeyBytes);
 
-  // THIS LOG WILL CONFIRM IT'S WORKING!
   console.log(`✅ Solana platform wallet loaded successfully. Public Key: ${platformKeypair.publicKey.toBase58()}`);
 
 } catch (error) {
   console.error("❌ FATAL ERROR: Could not load the platform's Solana keypair.", error.message);
-  platformKeypair = null; // Ensure it's null if loading fails
+  platformKeypair = null;
 }
-
-// ... the rest of the file remains the same ...
 
 const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
 
