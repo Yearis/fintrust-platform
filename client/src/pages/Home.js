@@ -13,6 +13,7 @@ const Home = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
+      console.log('[Home.js] isAuthenticated is true, navigating to dashboard...');
       navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
@@ -23,7 +24,7 @@ const Home = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submit button was clicked!'); // <-- DEBUGGING MESSAGE
+    console.log('[Home.js] Form submit button was clicked!');
     setError('');
     setLoading(true);
 
@@ -34,7 +35,8 @@ const Home = () => {
         await register({ name: formData.name, email: formData.email, password: formData.password });
       }
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'An error occurred');
+      console.error('[Home.js] Login failed with error:', err);
+      setError(err.message || 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -46,6 +48,7 @@ const Home = () => {
     setFormData({ name: '', email: '', password: '' });
   };
 
+  // The rest of your JSX remains the same
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
@@ -57,14 +60,11 @@ const Home = () => {
           <h2 className="text-2xl font-bold text-center text-fintrust-dark mb-6">
             {isLoginMode ? 'Sign In' : 'Create Account'}
           </h2>
-
           {error && (
             <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded mb-4">
               {error}
             </div>
           )}
-          
-          {/* Ensure the button is INSIDE the form tag */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLoginMode && (
               <div>
@@ -84,7 +84,6 @@ const Home = () => {
               {loading ? 'Processing...' : (isLoginMode ? 'Sign In' : 'Create Account')}
             </button>
           </form>
-
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               {isLoginMode ? "Don't have an account? " : "Already have an account? "}

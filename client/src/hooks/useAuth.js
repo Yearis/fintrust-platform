@@ -4,11 +4,7 @@ import authService from '../services/authService';
 const AuthContext = createContext();
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  return useContext(AuthContext);
 };
 
 export const AuthProvider = ({ children }) => {
@@ -17,47 +13,50 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in on app start
     const initAuth = () => {
       const token = authService.getToken();
       const userData = authService.getCurrentUser();
-      
       if (token && userData) {
         setUser(userData);
         setIsAuthenticated(true);
       }
-      
       setLoading(false);
     };
-
     initAuth();
   }, []);
 
   const login = async (credentials) => {
     try {
+      console.log('[useAuth] Calling authService.login...');
       const response = await authService.login(credentials);
+      console.log('[useAuth] Server response received:', response);
+
       if (response.success) {
+        console.log('[useAuth] Login successful, setting user state.');
         const { token, ...userData } = response.data;
         setUser(userData);
         setIsAuthenticated(true);
         return response;
+      } else {
+        console.log('[useAuth] Login failed according to server, throwing error:', response.message);
+        throw new Error(response.message || 'Invalid credentials');
       }
     } catch (error) {
+      console.error('[useAuth] An error was caught during login:', error);
       throw error;
     }
   };
 
   const register = async (userData) => {
-    try {
-      const response = await authService.register(userData);
-      if (response.success) {
-        const { token, ...user } = response.data;
-        setUser(user);
-        setIsAuthenticated(true);
-        return response;
-      }
-    } catch (error) {
-      throw error;
+    // This function can be updated with similar logging if needed
+    const response = await authService.register(userData);
+    if (response.success) {
+      const { token, ...user } = response.data;
+      setUser(user);
+      setIsAuthenticated(true);
+      return response;
+    } else {
+      throw new Error(response.message || 'Registration failed');
     }
   };
 
@@ -67,18 +66,7 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
-  const value = {
-    user,
-    isAuthenticated,
-    loading,
-    login,
-    register,
-    logout
-  };
+  const value = { user, isAuthenticated, loading, login, register, logout };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
